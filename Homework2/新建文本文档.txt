@@ -1,0 +1,37 @@
+charset=0:9;%size符号集
+input=Y_RLE(:,2);
+[y,x]=size(input);
+p=zeros(1,10);
+tb=strings(1,y);%定义字符串数组
+list_of_size=zeros(1,y);
+
+for i=1:y
+    tb(i)=dec2bin(abs(input(i)));
+end
+tb=convertStringsToChars(tb);
+for i=1:y
+    [~,list_of_size(i)]=size(tb(i));
+end
+
+for i=1:10
+    p(i)=length(find(list_of_size==charset(i)))/y;
+end
+[huffman_dictionary,average]=huffmandict(charset,p);
+enco = huffmanenco(input,huffman_dictionary); %得到size的编码，下面要裁剪幅度的编码
+binary_code=dec2bin(abs(input));%得到原先数组的二进制形式
+for i=1:y
+    if(input(i)<0)%对于所有小于0的数
+        binary_code=bitxor(abs(input(i)),255);%取反
+    else
+        binary_code=dec2bin(abs(input(i)));
+    end%此时应该得到了所有的幅度
+end
+cutted_string='';
+for i=1:y
+    temp_string=binary_code(i);
+    strcat(cutted_string,temp_string(8-list_of_size(i):8));%拼接字符串
+end
+
+% [huffman_dictionary,average]=huffmandict(charset,p);
+% enco = huffmanenco(input,huffman_dictionary); %编码
+% deco = huffmandeco(enco,huffman_dictionary); %解码

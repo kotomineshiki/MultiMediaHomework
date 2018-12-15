@@ -1,25 +1,27 @@
-function b=DCT_Transform(arg1,mrows,ncols)
-[m, n] = size(arg1);
-% Basic algorithm.
-if (nargin == 1)
-  if (m > 1) && (n > 1)
-    b = dct(dct(arg1).').';
-    return;
-  else
-    mrows = m;
-    ncols = n;
-  end
+function Y=DCT_Transform(X)
+A=zeros(8);
+ for u=0:7
+     for v=0:7
+        if u==0
+            CU=0.5^0.5;
+         else
+            CU=1;
+        end   
+        if v==0
+            CV=sqrt(1/2);
+         else
+            CV=sqrt(1);
+        end 
+        sum=0;
+        for i=0:7
+            for j=0:7
+                sum=sum+(cos((2*i+1)*u*pi/16)*cos((2*j+1)*v*pi/16)*X(i+1,j+1));
+            end
+        end
+        A(u+1,v+1)=(CU*CV/4)*sum;
+    end
+ end
+Y=A;
+
 end
-
-% Padding for vector input.
-a = arg1;
-if nargin==2, ncols = mrows(2); mrows = mrows(1); end
-mpad = mrows; npad = ncols;
-if m == 1 && mpad > m, a(2, 1) = 0; m = 2; end
-if n == 1 && npad > n, a(1, 2) = 0; n = 2; end
-if m == 1, mpad = npad; npad = 1; end   % For row vector.
-
-% Transform.
-
-b = dct(a, mpad);
-if m > 1 && n > 1, b = dct(b.', npad).'; end
+%dct2()
